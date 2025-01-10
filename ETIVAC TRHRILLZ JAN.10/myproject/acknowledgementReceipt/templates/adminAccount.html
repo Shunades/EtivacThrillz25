@@ -1,0 +1,25 @@
+{% extends 'adminBookingHistory.html' %}
+
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin: 20px auto;">
+    <h2>My Account</h2>
+
+    <!-- Account Overview Section -->
+    <div style="width: 50%; margin: 20px auto; text-align: left;">
+        <h3>Account Overview</h3>
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <p><strong>Role:</strong> {{ role }}</p>
+    </div>
+
+    <!-- Log Out Button -->
+    <div style="margin-top: 20px;">
+        <a href="{% url 'logout' %}" 
+           style="display: inline-block; padding: 10px 20px; background-color: #f34d4d; color: white; text-decoration: none; font-weight: bold; border-radius: 5px; transition: background-color 0.3s, transform 0.2s;">
+           Log Out
+        </a>
+    </div>
+</div>
+{% endblock %}

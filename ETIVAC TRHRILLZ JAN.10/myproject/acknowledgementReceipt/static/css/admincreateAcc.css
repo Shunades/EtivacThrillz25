@@ -1,0 +1,145 @@
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;/* Light background */
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Centered Content */
+h2 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Create Account Container */
+div {
+    width: 80%;
+    max-width: 600px;
+    background-color: #f4f4f4;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #f4f4f4;/* Simple white background */
+}
+
+/* Form Styles */
+form {
+    width: 100%;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+td {
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* Custom Styles for the Email Wrapper */
+.email-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.email-wrapper input[type="text"] {
+    width: 80%;
+    padding: 10px;
+}
+
+.email-wrapper span {
+    font-size: 14px;
+    color: #333;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Submit Button Styles */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Form Validation Feedback */
+input:invalid {
+    border-color: red; /* Red border for invalid input */
+}
+
+input:valid {
+    border-color: #4CAF50; /* Green border for valid input */
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    margin-top: 30px;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    div {
+        width: 90%;
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    table td {
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .email-wrapper input[type="text"] {
+        width: 100%;
+    }
+
+    button[type="submit"] {
+        padding: 10px;
+    }
+}

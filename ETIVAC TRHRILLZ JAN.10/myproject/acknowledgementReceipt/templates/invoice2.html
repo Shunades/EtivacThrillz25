@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="{% static 'css/invoice.css' %}">
+    <style>
+        .total-cost {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button[aria-label="Go back"] {
+            background-color: #6c757d;
+        }
+
+        button[aria-label="Go back"]:hover {
+            background-color: #5a6268;
+        }
+
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+    <script>
+        function proceedToPayment() {
+            const button = document.querySelector('button[onclick="proceedToPayment()"]');
+            button.disabled = true; // Disable the button to prevent multiple clicks
+            button.textContent = "Processing..."; // Update button text while processing
+
+            try {
+                // Redirect to the GateAdminPayment path
+                window.location.href = "{% url 'GateAdminPayment' %}";
+            } catch (error) {
+                button.disabled = false; // Re-enable the button if navigation fails
+                button.textContent = "Proceed to Payment"; // Reset button text
+                alert("Unable to proceed to payment. Please try again later.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="receipt">
+        <header>
+            <h1>Invoice</h1>
+        </header>
+
+        <section>
+            <h2>Customer Information</h2>
+            <p><strong>Name:</strong> {{ customer_name }}</p>
+            <p><strong>Email:</strong> {{ customer_email }}</p>
+        </section>
+
+        <section>
+            <h2>Selected Date</h2>
+            <p><strong>Date Availed:</strong> {{ ticket_date }}</p>
+        </section>
+
+        <section>
+            <h2>Ticket Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket Type</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket, details in availed_tickets.items %}
+                    <tr>
+                        <td>{{ ticket|capfirst }}</td>
+                        <td>{{ details.quantity }}</td>
+                        <td>₱{{ details.price }}</td>
+                        <td>₱{{ details.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Total Cost</h2>
+            <p class="total-cost">₱{{ total_cost }}</p>
+        </section>
+
+        <div>
+            <button onclick="window.history.back()" aria-label="Go back">Back</button>
+            <button onclick="proceedToPayment()" aria-label="Proceed to payment">Proceed to Payment</button>
+        </div>
+    </div>
+</body>
+</html>

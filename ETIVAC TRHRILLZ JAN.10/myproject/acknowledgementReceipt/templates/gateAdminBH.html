@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History</title>
+    <link rel="stylesheet" href="{% static 'css/gateadmin.css' %}">
+    <script>
+        // Filter table rows based on status
+        function filterTable(status) {
+            const rows = document.querySelectorAll("table.booking-history tbody tr");
+            rows.forEach(row => {
+                const statusCell = row.querySelector("td:last-child"); // Assuming "Status" is in the last column
+                if (status === 'all') {
+                    row.style.display = ""; // Show all rows
+                } else {
+                    const cellText = statusCell.textContent.trim().toLowerCase();
+                    row.style.display = cellText === status.toLowerCase() ? "" : "none"; // Show/hide based on status
+                }
+            });
+        }
+
+        // Search table rows based on user input
+        function searchTable() {
+            const searchInput = document.getElementById("searchBox").value.toLowerCase();
+            const rows = document.querySelectorAll("table.booking-history tbody tr");
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchInput) ? "" : "none"; // Show/hide based on search match
+            });
+        }
+
+        // Sort table rows based on selected criteria
+        function sortTable(criteria) {
+            const tableBody = document.querySelector("table.booking-history tbody");
+            const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+            let compareFunction;
+
+            if (criteria === 'name') {
+                compareFunction = (a, b) => a.querySelector("td:nth-child(2)").textContent.localeCompare(b.querySelector("td:nth-child(2)").textContent);
+            } else if (criteria === 'date') {
+                compareFunction = (a, b) => new Date(a.querySelector("td:nth-child(5)").textContent) - new Date(b.querySelector("td:nth-child(5)").textContent);
+            } else if (criteria === 'status') {
+                const statusOrder = { 'pending': 1, 'paid': 2, 'declined': 3 };
+                compareFunction = (a, b) => statusOrder[a.querySelector("td:last-child").textContent.toLowerCase()] - statusOrder[b.querySelector("td:last-child").textContent.toLowerCase()];
+            }
+
+            rows.sort(compareFunction);
+            rows.forEach(row => tableBody.appendChild(row)); // Re-append rows in sorted order
+        }
+
+        // Initialize table with all bookings on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            filterTable('all');
+        });
+
+        // Remove tickets function (existing functionality)
+        function removeTickets() {
+            const form = document.getElementById('ticketForm');
+            const selectedTickets = Array.from(form.querySelectorAll('input[name="ticket"]:checked')).map(
+                (checkbox) => checkbox.value
+            );
+
+            if (selectedTickets.length === 0) {
+                alert("Please select at least one ticket to remove.");
+                return;
+            }
+
+            const confirmation = confirm("Are you sure you want to remove the selected tickets?");
+            if (!confirmation) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
+            formData.append('action', 'remove');
+            selectedTickets.forEach((ticketId) => formData.append('ticket', ticketId));
+
+            fetch('{% url "gateadmin_bh" %}', {
+                method: 'POST',
+                body: formData,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    selectedTickets.forEach(id => {
+                        const row = document.querySelector(`input[value="${id}"]`).closest('tr');
+                        row.remove(); // Remove rows for deleted tickets
+                    });
+                } else {
+                    alert("Failed to remove tickets. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            });
+        }
+
+        // Update ticket status function (existing functionality)
+        function updateTicketStatus(status) {
+            const form = document.getElementById('ticketForm');
+            const selectedTickets = Array.from(form.querySelectorAll('input[name="ticket"]:checked')).map(
+                (checkbox) => checkbox.value
+            );
+
+            if (selectedTickets.length === 0) {
+                alert("Please select at least one ticket to update.");
+                return;
+            }
+
+            const confirmation = confirm(`Are you sure you want to mark the selected tickets as ${status}?`);
+            if (!confirmation) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', form.querySelector('[name="csrfmiddlewaretoken"]').value);
+            formData.append('status', status);
+            selectedTickets.forEach((ticketId) => formData.append('ticket', ticketId));
+
+            fetch('{% url "gateadmin_bh" %}', {
+                method: 'POST',
+                body: formData,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    selectedTickets.forEach(id => {
+                        const row = document.querySelector(`input[value="${id}"]`).closest('tr');
+                        const statusCell = row.querySelector('td:last-child');
+                        statusCell.textContent = status;
+                    });
+                } else {
+                    alert("Failed to update ticket status. Please try again.");
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert("An error occurred. Please try again.");
+            });
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <img src="{% static 'media/logo.png' %}" alt="Logo">
+        <nav>
+            <a href="{% url 'gateadmin_bh' %}">Booking History</a>
+            <a href="/gateadmin/buyticket/">Buy Ticket</a>
+            <a href="/gateadmin/account/">My Account</a>
+        </nav>
+    </header>
+
+    {% block content %}
+    <div>
+        <h2 align="center">Booking History</h2>
+
+        <form id="ticketForm" method="POST" action="{% url 'gateadmin_bh' %}">
+            {% csrf_token %}
+            <div class="search-filters">
+                <input type="text" id="searchBox" placeholder="Search..." onkeyup="searchTable()">
+                <button type="button" onclick="filterTable('all')">ALL BOOKINGS</button>
+                <button type="button" onclick="filterTable('pending')">PENDING</button>
+                <button type="button" onclick="filterTable('paid')">SUCCESSFUL</button>
+                <select onchange="sortTable(this.value)">
+                    <option value="">Sort By</option>
+                    <option value="name">Sort By Name</option>
+                    <option value="date">Sort By Date</option>
+                    <option value="status">Sort By Status</option>
+                </select>
+            </div>
+
+            <table class="booking-history">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Ticket Type/s</th>
+                        <th>Number of Limited Rides</th>
+                        <th>Date Reservation</th>
+                        <th>Date Availed</th>
+                        <th>Receipt of Payment</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in ticket_reservations %}
+                    <tr>
+                        <td><input type="checkbox" name="ticket" value="{{ ticket.id }}"></td>
+                        <td>{{ ticket.customer_name }}</td>
+                        <td>
+                            {% if ticket.unlimited_quantity > 0 %}Unlimited{% endif %}
+                            {% if ticket.limited_quantity > 0 %}{% if ticket.unlimited_quantity > 0 %}, {% endif %}Limited{% endif %}
+                        </td>
+                        <td>{{ ticket.number_of_rides }}</td>
+                        <td>{{ ticket.date_of_purchase|date:"Y-m-d H:i" }}</td>
+                        <td>{{ ticket.ticket_date_availed|default:"Not Availed"|date:"Y-m-d H:i" }}</td>
+                        <td>{{ ticket.receipt_of_payment }}</td>
+                        <td>{{ ticket.customer_email }}</td>
+                        <td>{{ ticket.status|default:"Pending" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" align="center">No booking records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div align="center" class="action-buttons">
+                <button class="paid" type="button" onclick="updateTicketStatus('PAID')">PAID</button>
+                <button class="decline" type="button" onclick="updateTicketStatus('DECLINED')">DECLINE</button>
+                <button class="remove" type="button" onclick="removeTickets()">REMOVE</button>
+            </div>
+        </form>
+    </div>
+    {% endblock %}
+
+    <footer>
+        <p>&copy; 2024 Your Company. All rights reserved.</p>
+    </footer>
+</body>
+</html>

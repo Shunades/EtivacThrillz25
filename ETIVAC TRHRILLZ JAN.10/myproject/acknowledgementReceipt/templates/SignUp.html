@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sign Up</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+  <script>
+    function validateSignUpForm(event) {
+      // Prevent form submission until validation passes
+      event.preventDefault();
+
+      // Clear previous error messages
+      document.getElementById("username-error").textContent = "";
+      document.getElementById("email-error").textContent = "";
+      document.getElementById("password-error").textContent = "";
+      document.getElementById("confirm-password-error").textContent = "";
+
+      // Get the form field values
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      let isValid = true;
+
+      // Validate username
+      if (username === "") {
+        document.getElementById("username-error").textContent = "Username is required.";
+        isValid = false;
+      }
+
+      // Validate email
+      if (email === "") {
+        document.getElementById("email-error").textContent = "Email is required.";
+        isValid = false;
+      }
+
+      // Validate password
+      if (password === "") {
+        document.getElementById("password-error").textContent = "Password is required.";
+        isValid = false;
+      }
+
+      // Validate confirm password
+      if (confirmPassword === "") {
+        document.getElementById("confirm-password-error").textContent = "Please confirm your password.";
+        isValid = false;
+      } else if (password !== confirmPassword) {
+        document.getElementById("confirm-password-error").textContent = "Passwords do not match.";
+        isValid = false;
+      }
+
+      // If the form is valid, submit it
+      if (isValid) {
+        document.getElementById("signup-form").submit(); // Submit the form if valid
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="form-container">
+    <!-- Display server-side error messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    
+    <h1 class="form-title">Create an Account</h1>
+    <p class="subtitle">Please fill out the form to sign up.</p>
+    
+    <!-- Form for user signup -->
+    <form id="signup-form" method="post" action="{% url 'signup' %}" onsubmit="validateSignUpForm(event)">
+      {% csrf_token %}
+      
+      <!-- Username -->
+      <div class="input-group">
+        <input type="text" id="username" name="username" placeholder=" " required />
+        <label for="username" class="floating-label">Username</label>
+        <span id="username-error" style="color: red;"></span>
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+        <input type="email" id="email" name="email" placeholder=" " required />
+        <label for="email" class="floating-label">Email</label>
+        <span id="email-error" style="color: red;"></span>
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+        <input type="password" id="password" name="password" placeholder=" " required />
+        <label for="password" class="floating-label">Create Password</label>
+        <span id="password-error" style="color: red;"></span>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="input-group">
+        <input type="password" id="confirm-password" name="confirm-password" placeholder=" " required />
+        <label for="confirm-password" class="floating-label">Confirm Password</label>
+        <span id="confirm-password-error" style="color: red;"></span>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="button-container">
+        <button type="submit" class="signup-button">Sign Up</button>
+      </div>
+    </form>
+
+    <!-- Link to login page -->
+    <p class="login-link">Already have an account? <a href="{% url 'signin' %}">Login here</a></p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="{% static 'css/payment.css' %}">
+    <script>
+        function validateForm(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const referenceNumber = document.getElementById('reference-number').value.trim();
+            const fileInput = document.getElementById('receipt-file').files[0];
+
+            if (!referenceNumber) {
+                alert("Please enter the reference number.");
+                return;
+            }
+
+            if (isNaN(referenceNumber) || referenceNumber <= 0) {
+                alert("The reference number must be a valid numeric value.");
+                return;
+            }
+
+            if (!fileInput) {
+                alert("Please attach the screenshot of your payment receipt.");
+                return;
+            }
+
+            // Validate file type
+            const allowedExtensions = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!allowedExtensions.includes(fileInput.type)) {
+                alert("Please upload a valid image file (JPEG, PNG).");
+                return;
+            }
+
+            // Show confirmation popup
+            const isConfirmed = confirm(
+                `Please confirm the following details before submitting:\n\n` +
+                `GCash Name: Mary Lian J.\n` +
+                `Reference Number: ${referenceNumber}\n` +
+                `Attached file: ${fileInput.name}\n\n` +
+                `Ensure the details are correct. Click OK to proceed or Cancel to recheck.`
+            );
+
+            if (isConfirmed) {
+                alert("Payment details submitted successfully!");
+
+                // Redirect to the 'gateadmin/buyticket/' page
+                window.location.href = "{% url 'gateadminticket' %}";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="payment-container">
+        <h1>Payment</h1>
+        <p>Please send your payment through <strong>GCash</strong> to:</p>
+        <p><strong>09179004407</strong></p>
+        <p><strong>Mary Lian J.</strong></p>
+
+        <form onsubmit="validateForm(event)">
+            <label for="reference-number">GCash Reference Number:</label>
+            <input type="number" id="reference-number" placeholder="Enter GCash Reference Number" required>
+            
+            <label for="receipt-file">Attach Screenshot of Receipt:</label>
+            <input type="file" id="receipt-file" accept=".jpg,.jpeg,.png" required>
+            
+            <p class="instructions">Attach a screenshot of your payment receipt (JPEG or PNG format).</p>
+            <button type="submit">Submit Payment</button>
+        </form>
+    </div>
+</body>
+</html>

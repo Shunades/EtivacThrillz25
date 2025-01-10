@@ -1,0 +1,96 @@
+{% extends "adminBookingHistory.html" %}
+
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+    <!-- Load static files -->
+    {% load static %}
+    
+    <link rel="stylesheet" href="{% static 'css/admincreateAcc.css' %}">
+
+    <div align="center">
+        <h2>Create Account For Gate Admin</h2>
+
+        <!-- Account Creation Form -->
+        <div>
+            <form action="{% url 'eaadmin_create' %}" method="POST" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td>First Name</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Enter First Name" name="firstName" required></td>
+                    </tr>
+
+                    <tr>
+                        <td>Last Name</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Enter Last Name" name="lastName" required></td>
+                    </tr>
+
+                    <tr>
+                        <td>Email</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="email-wrapper">
+                                <input type="text" id="username" placeholder="Username" required>
+                                <span>@etivacthrillz.gateadmin.com</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Create Password</td>
+                    </tr>
+                    <tr>
+                        <td><input type="password" placeholder="Create Password" name="password" required></td>
+                    </tr>
+
+                    <tr>
+                        <td>Confirm Password</td>
+                    </tr>
+                    <tr>
+                        <td><input type="password" placeholder="Confirm Password" name="confirmPassword" required></td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">
+                            <br>
+                            <button type="submit">Create Account</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const usernameInput = document.getElementById('username');
+            const username = usernameInput.value.trim(); // Get the input value and trim whitespace
+            const password = document.querySelector('input[name="password"]').value;
+            const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return false; // Prevent form submission
+            }
+
+            // Set the email value with domain
+            const email = username + '@etivacthrillz.gateadmin.com';
+            const emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'email'; // Use the same name as in your form handling
+            emailInput.value = email; // Set the full email address
+
+            // Append the email input to the form
+            const form = document.querySelector('form');
+            form.appendChild(emailInput);
+
+            return true; // Allow form submission
+        }
+    </script>
+{% endblock %}

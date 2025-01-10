@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/signin.css' %}">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .forgot-password {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .forgot-password a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <!-- Display messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="success-message" {% if 'success' not in message.tags %}style="display:none;"{% endif %}>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form id="login-form" method="POST" action="{% url 'signin' %}">
+            {% csrf_token %}
+            <h2 class="form-title">Login</h2>
+
+            <!-- Notice for Admins and Gate Admins -->
+            <p class="subtitle">
+                Gate Admins and Admins, please use your email with the domain 
+                <strong>@etivacthrillz.gateadmin.com</strong> or the admin email 
+                <strong>@etivacthrillz.admin.com</strong>.
+            </p>
+            
+            <!-- Email Input -->
+            <div class="input-group">
+                <input id="email" name="email" type="email" placeholder=" " required aria-label="Email" aria-describedby="email-error">
+                <label for="email" class="floating-label">Email</label>
+                <span id="email-error" class="error-message"></span>
+            </div>
+
+            <!-- Password Input -->
+            <div class="input-group">
+                <input id="password" name="password" type="password" placeholder=" " required aria-label="Password" aria-describedby="password-length-error password-chars-error">
+                <label for="password" class="floating-label">Password</label>
+                <span id="password-length-error" class="error-message"></span>
+                <span id="password-chars-error" class="error-message"></span>
+            </div>
+
+            <!-- Remember Me -->
+            <div>
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+
+            <!-- Login Button -->
+            <div class="button-container">
+                <button type="submit" class="login-button">Login</button>
+            </div>
+
+            <!-- Forgot Password -->
+            <div class="forgot-password">
+                <a href="/forgot-password/" id="forgot-password-link">Forgot Password?</a>
+            </div>
+
+            <!-- Signup Link -->
+            <p class="signup-link">Don’t have an account yet? <a href="/signup/">Sign up here!</a></p>
+        </form>
+    </div>
+
+    <script>
+        // Client-side validation
+        document.getElementById("login-form").onsubmit = function(event) {
+            var email = document.getElementById("email").value.trim();
+            var password = document.getElementById("password").value.trim();
+            var valid = true;
+
+            // Clear error messages
+            document.getElementById("email-error").innerText = "";
+            document.getElementById("password-length-error").innerText = "";
+
+            // Validate email format
+            var emailRegex = /^[a-zA-Z0-9._%+-]+@(etivacthrillz\.(gateadmin|admin)\.com|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById("email-error").innerText = "Please enter a valid email.";
+                valid = false;
+            }
+
+            // Ensure form submission if valid
+            if (!valid) {
+                event.preventDefault();
+            }
+        };
+
+        // Optional Forgot Password handler
+        document.getElementById("forgot-password-link").addEventListener("click", function(event) {
+            alert("Redirecting to the Forgot Password page.");
+        });
+    </script>
+</body>
+</html>
